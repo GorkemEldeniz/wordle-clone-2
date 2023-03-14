@@ -1,5 +1,6 @@
 const board = document.querySelector(".board");
 const keyboard = document.querySelector(".keyboard");
+import data from "./words.js";
 
 //create table
 let table = new Array(6)
@@ -30,78 +31,93 @@ updateAndCreateTable(table);
 
 let row = 0;
 let tile = 0;
-let guessWord = "ELMAS";
+let guessWord =
+	data[Math.floor(Math.random() * data.length)].toLocaleUpperCase("tr");
 let isGameFinsished = false;
-let regex = /^[a-zA-Z\s]+$/;
 
-keyboard.addEventListener("click", (e) => {
-	if (e.target.tagName == "BUTTON" || e.target.tagName == "SVG") {
-		let val = e.target.textContent.trim().length
-			? e.target.textContent
-			: "Delete";
+if (!isGameFinsished) {
+	keyboard.addEventListener("click", (e) => {
+		if (e.target.tagName == "BUTTON" || e.target.tagName == "SVG") {
+			let val = e.target.textContent.trim().length
+				? e.target.textContent
+				: "Delete";
 
-		if (isGameFinsished) {
-			console.log("oyun bitti");
-			return;
+			if (tile > 5) {
+				tile = 5;
+			}
+
+			if (tile < 5 && val == "Enter") {
+				return;
+			}
+
+			if (tile > 4 && val == "Enter") {
+				let word = virtualCopy[row]
+					.map(({ value }) => value)
+					.join("")
+					.slice(0, 5)
+					.toLocaleLowerCase("tr");
+
+				if (data.includes(word)) {
+					updateAndCreateTable(check(row));
+					if (gameIsOver(row)) {
+						isGameFinsished = true;
+						return;
+					}
+					tile = 0;
+					row++;
+				}
+			} else if (val == "Delete" && tile > 0) {
+				updateAndCreateTable(handleDelete(tile));
+				tile--;
+			} else {
+				if (val !== "Delete") {
+					updateAndCreateTable(handleInput(val));
+					tile++;
+				}
+			}
 		}
+	});
+
+	window.addEventListener("keydown", (e) => {
 		if (tile > 5) {
 			tile = 5;
 		}
 
-		if (tile < 5 && val == "Enter") {
+		if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
 			return;
 		}
 
-		if (tile > 4 && val == "Enter") {
-			updateAndCreateTable(check(row));
-			if (gameIsOver(row)) {
-				isGameFinsished = true;
+		if (tile < 5 && e.key == "Enter") {
+			return;
+		}
+
+		if (tile > 4 && e.key == "Enter") {
+			let word = virtualCopy[row]
+				.map(({ value }) => value)
+				.join("")
+				.slice(0, 5)
+				.toLocaleLowerCase("tr");
+
+			if (data.includes(word)) {
+				updateAndCreateTable(check(row));
+				if (gameIsOver(row)) {
+					isGameFinsished = true;
+					return;
+				}
+				tile = 0;
+				row++;
 			}
-			tile = 0;
-			row++;
-		} else if (val == "Delete" && tile >= 0) {
-			console.log("sil");
+		} else if (e.key == "Backspace" && tile > 0) {
 			updateAndCreateTable(handleDelete(tile));
 			tile--;
 		} else {
-			updateAndCreateTable(handleInput(val));
-			tile++;
+			if (e.key !== "Backspace") {
+				updateAndCreateTable(handleInput(e.key.toLocaleUpperCase("tr")));
+				tile++;
+			}
 		}
-	}
-});
-
-window.addEventListener("keydown", (e) => {
-	if (isGameFinsished) {
-		console.log("oyun bitti");
-		return;
-	}
-	if (tile > 5) {
-		tile = 5;
-	}
-
-	if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
-		return;
-	}
-
-	if (tile < 5 && e.key == "Enter") {
-		return;
-	}
-
-	if (tile > 4 && e.key == "Enter") {
-		updateAndCreateTable(check(row));
-		if (gameIsOver(row)) {
-			isGameFinsished = true;
-		}
-		tile = 0;
-		row++;
-	} else if (e.key == "Backspace" && tile >= 0) {
-		updateAndCreateTable(handleDelete(tile));
-		tile--;
-	} else {
-		updateAndCreateTable(handleInput(e.key.toUpperCase()));
-		tile++;
-	}
-});
+	});
+}
 
 //check is word is true
 function check(row) {
