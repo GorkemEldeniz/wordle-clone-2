@@ -1,4 +1,5 @@
 const board = document.querySelector(".board");
+const keyboard = document.querySelector(".keyboard");
 
 //create table
 let table = new Array(6)
@@ -33,6 +34,42 @@ let guessWord = "ELMAS";
 let isGameFinsished = false;
 let regex = /^[a-zA-Z\s]+$/;
 
+keyboard.addEventListener("click", (e) => {
+	if (e.target.tagName == "BUTTON" || e.target.tagName == "SVG") {
+		let val = e.target.textContent.trim().length
+			? e.target.textContent
+			: "Delete";
+
+		if (isGameFinsished) {
+			console.log("oyun bitti");
+			return;
+		}
+		if (tile > 5) {
+			tile = 5;
+		}
+
+		if (tile < 5 && val == "Enter") {
+			return;
+		}
+
+		if (tile > 4 && val == "Enter") {
+			updateAndCreateTable(check(row));
+			if (gameIsOver(row)) {
+				isGameFinsished = true;
+			}
+			tile = 0;
+			row++;
+		} else if (val == "Delete" && tile >= 0) {
+			console.log("sil");
+			updateAndCreateTable(handleDelete(tile));
+			tile--;
+		} else {
+			updateAndCreateTable(handleInput(val));
+			tile++;
+		}
+	}
+});
+
 window.addEventListener("keydown", (e) => {
 	if (isGameFinsished) {
 		console.log("oyun bitti");
@@ -61,26 +98,40 @@ window.addEventListener("keydown", (e) => {
 		updateAndCreateTable(handleDelete(tile));
 		tile--;
 	} else {
-		updateAndCreateTable(handleInput(e));
+		updateAndCreateTable(handleInput(e.key.toUpperCase()));
 		tile++;
 	}
 });
 
 //check is word is true
 function check(row) {
+	let signedLetters = [];
+	const buttons = document.querySelectorAll(".keyboard button");
+
 	let elements = virtualCopy[row].map((el, i) => {
 		let state = "";
 		if (el.value == guessWord[i]) {
+			signedLetters.push({ state: "correct", value: el.value, priority: 2 });
 			state = "correct";
 		} else if (guessWord.includes(el.value)) {
+			signedLetters.push({ state: "present", value: el.value, priority: 1 });
 			state = "present";
 		} else {
+			signedLetters.push({ state: "absent", value: el.value, priority: 0 });
 			state = "absent";
 		}
 		return {
 			value: el.value,
 			state,
 		};
+	});
+
+	[...buttons].map((button, index) => {
+		let ar = signedLetters.filter(({ value }) => value == button.textContent);
+		if (ar.length && !button.classList.contains("correct")) {
+			let { state } = ar.sort((a, b) => b.priority - a.priority)[0];
+			button.classList.add(`${state}`);
+		}
 	});
 
 	let newTable = virtualCopy.map((el, i) => {
@@ -91,7 +142,6 @@ function check(row) {
 	});
 
 	virtualCopy = newTable.slice();
-	console.log(virtualCopy);
 	return virtualCopy;
 }
 
@@ -101,10 +151,10 @@ function gameIsOver(row) {
 }
 
 //get the input from user
-function handleInput(e) {
+function handleInput(letter) {
 	let newTable = virtualCopy.map((el, index) => {
 		if (index == row) {
-			el[tile] = { value: e.key.toUpperCase(), state: "" };
+			el[tile] = { value: letter, state: "" };
 		}
 		return el;
 	});
@@ -122,9 +172,4 @@ function handleDelete(step) {
 	});
 	virtualCopy = newTable.slice();
 	return newTable;
-}
-
-//handle Submit
-function handleSubmit(e) {
-	return;
 }

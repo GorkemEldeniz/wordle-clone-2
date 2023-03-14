@@ -111,3 +111,67 @@ header .menu button {
 .cell[data-state="absent"] {
   background-color: #3a3a3c;
 }
+
+.keyboard {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 12px;
+}
+
+.keyboard>div {
+  display: flex;
+  gap: 6px;
+}
+
+.keyboard>div:nth-child(2)>button {
+  width: 35px;
+}
+
+.keyboard>div:nth-child(3)>button:nth-child(1),
+button:nth-last-child(1) {
+  flex: 2;
+}
+
+.keyboard>div:nth-child(3)>button:nth-last-child(1) {
+  flex: 2;
+}
+
+
+
+.keyboard button {
+  text-transform: uppercase;
+  font-family: inherit;
+  font-weight: bold;
+  border: 0;
+  padding: 0;
+  height: 58px;
+  width: 43px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  background-color: #818384;
+  color: #d7dadc;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+}
+
+
+.absent {
+  background-color: #3a3a3c !important;
+}
+
+.present {
+  background-color: #b59f3b !important;
+}
+
+.correct {
+  background-color: #538d4e !important;
+}
