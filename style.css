@@ -28,9 +28,46 @@
 body,
 html {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #121213;
   font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+body>main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.none {
+  opacity: 0;
+  position: absolute;
+  visibility: hidden;
+}
+
+.popup {
+  opacity: 0;
+  position: absolute;
+  visibility: hidden;
+  position: absolute;
+  left: 0;
+  bottom: -100%;
+  width: 100%;
+  height: 0;
+  transition: all 200ms ease 100ms;
+  background-color: #121213;
+}
+
+.animate {
+  opacity: 1;
+  visibility: visible;
+  bottom: 0;
+  height: 100%;
 }
 
 header {
@@ -74,6 +111,7 @@ header .menu button {
   justify-content: center;
   align-items: center;
   padding: 1rem 0;
+  flex: 1;
   gap: 5px;
 }
 
@@ -174,4 +212,79 @@ button:nth-last-child(1) {
 
 .correct {
   background-color: #538d4e !important;
+}
+
+.popup>.wrapper {
+  margin: 1rem auto;
+  display: flex;
+  width: fit-content;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 10px 0;
+  gap: 14px;
+  flex-direction: column;
+}
+
+.popup>.wrapper>article {
+  color: #d7dadc;
+  position: relative;
+  font-size: 14px;
+  display: flex;
+  gap: 14px;
+  flex-direction: column;
+}
+
+article>h1 {
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+article>h2 {
+  font-size: 14px;
+}
+
+article>svg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 99;
+  cursor: pointer;
+}
+
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #d3d6da;
+  border-top: 1px solid #d3d6da;
+  color: #d7dadc;
+}
+
+.sample {
+  display: flex;
+}
+
+.examples>h3,
+p {
+  font-size: 14px;
+}
+
+.sample>span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  font-size: 28px;
+  line-height: 28px;
+  font-weight: bold;
+  color: #d7dadc;
+  margin-right: 4px;
+  background-color: #121213;
+  border: 2px solid #565758;
+  color: #d7dadc;
+
 }
