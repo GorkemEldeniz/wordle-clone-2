@@ -286,5 +286,46 @@ p {
   background-color: #121213;
   border: 2px solid #565758;
   color: #d7dadc;
+}
 
+@media (max-width:500px) {
+
+  .keyboard {
+    width: 100% !important;
+  }
+
+  .keyboard>div {
+    width: 100%;
+  }
+
+  .keyboard>div>button {
+    width: calc(10% - 3px);
+  }
+
+  .keyboard>div:nth-child(2)>button {
+    width: calc(9% - 3px);
+  }
+
+  .keyboard>div:nth-child(3)>button {
+    width: calc(9% - 3px);
+  }
+
+  .keyboard>div:nth-child(3)>button:nth-child(1) {
+    width: 45px !important;
+  }
+
+  .keyboard>div:nth-child(3)>button:nth-last-child(1) {
+    width: 45px !important;
+  }
+
+  .board .wrapper {
+    width: 90%;
+  }
+
+  span.cell {
+    width: unset !important;
+    flex: 1;
+    aspect-ratio: 1;
+    height: unset !important;
+  }
 }

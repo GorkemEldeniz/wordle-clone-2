@@ -70,7 +70,6 @@ const popupWrapper = document.querySelector(".popup");
 //close btn for  the pop-up
 window.addEventListener("click", (e) => {
 	if (e.target.classList.contains("close") || e.target.tagName == "path") {
-		container.classList.remove("none");
 		popupWrapper.classList.remove("animate");
 	}
 });
@@ -108,9 +107,10 @@ let guessWord =
 	data[Math.floor(Math.random() * data.length)].toLocaleUpperCase("tr");
 let isGameFinsished = false;
 console.log(guessWord);
+
 if (!isGameFinsished) {
 	keyboard.addEventListener("click", (e) => {
-		if (e.target.tagName == "BUTTON" || e.target.tagName == "SVG") {
+		if (e.target.tagName == "BUTTON" || e.target.tagName == "svg") {
 			let val = e.target.textContent.trim().length
 				? e.target.textContent
 				: "Delete";
