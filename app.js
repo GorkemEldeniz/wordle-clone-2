@@ -9,8 +9,8 @@ const popupWrapper = document.querySelector(".popup");
 [...menuButtons].map((btn, index) => {
 	btn.addEventListener("click", (e) => {
 		e.stopPropagation();
-		popupWrapper.classList.add("animate");
 		if (index == 0) {
+			popupWrapper.classList.add("animate");
 			popupWrapper.innerHTML = ` <div class="wrapper">
       <article>
         <h1>NASIL OYNANIR</h1>

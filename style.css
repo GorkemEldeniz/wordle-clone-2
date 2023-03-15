@@ -41,7 +41,6 @@ body>main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
 }
 
 .none {
@@ -108,11 +107,11 @@ header .menu button {
 .board {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: 1rem 0;
-  flex: 1;
+  padding-top: 1rem;
   gap: 5px;
+  margin-bottom: 1rem;
 }
 
 .board .wrapper {
@@ -217,8 +216,7 @@ button:nth-last-child(1) {
 .popup>.wrapper {
   margin: 1rem auto;
   display: flex;
-  width: fit-content;
-  max-width: 500px;
+  max-width: min(500px, 90%);
   margin: 0 auto;
   padding: 10px 0;
   gap: 14px;
@@ -311,11 +309,17 @@ p {
   }
 
   .keyboard>div:nth-child(3)>button:nth-child(1) {
-    width: 45px !important;
+    width: 45px;
   }
 
   .keyboard>div:nth-child(3)>button:nth-last-child(1) {
-    width: 45px !important;
+    width: 45px;
+  }
+
+  .board {
+    justify-content: center;
+    margin-bottom: unset;
+    flex: 1;
   }
 
   .board .wrapper {
