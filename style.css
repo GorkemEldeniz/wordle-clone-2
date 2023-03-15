@@ -51,9 +51,9 @@ body>main {
 }
 
 .error {
-  transition: all 200ms ease;
   position: absolute;
   background-color: #d7dadc;
+  transition: all 200ms ease;
   text-align: center;
   padding: 1rem 2rem;
   color: #121213;
@@ -83,6 +83,66 @@ body>main {
   visibility: visible;
   bottom: 0;
   height: 100%;
+}
+
+
+.result {
+  transition: all 200ms ease;
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  min-width: 400px;
+  left: 50%;
+  transform: translate(-49%, -49%);
+  z-index: 99;
+  background-color: #121213;
+}
+
+.result>div {
+  padding: 2rem 2.5rem;
+  position: relative;
+  color: #d7dadc;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result div>svg {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+}
+
+.result .buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.buttons>button {
+  background-color: #599f44;
+  color: #d7dadc;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  height: 44px;
+  gap: 1rem;
+  flex: unset !important;
+}
+
+
+.result h2 {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-align: center;
 }
 
 header {

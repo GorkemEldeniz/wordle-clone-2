@@ -4,6 +4,14 @@ import data from "./words.js";
 const menuButtons = document.querySelectorAll(".menu  button");
 const popupWrapper = document.querySelector(".popup");
 const errorElement = document.querySelector(".error");
+const resultElement = document.querySelector(".result");
+
+//game variable
+let row = 0;
+let tile = 0;
+let guessWord =
+	data[Math.floor(Math.random() * data.length)].toLocaleUpperCase("tr");
+let isGameFinished = false;
 
 //menu buttons actions
 [...menuButtons].map((btn, index) => {
@@ -15,7 +23,7 @@ const errorElement = document.querySelector(".error");
       <article>
         <h1>NASIL OYNANIR</h1>
 				<svg class="close" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
-				<path fill="#565758" d="m12,0c-6.62736,0 -12,5.3724 -12,12c0,6.62763 5.37264,12 12,12c6.62763,0 12,-5.37237 12,-12c0,-6.6276 -5.37237,-12 -12,-12zm-3.6,7.2c0.30698,0 0.62819,0.1032 0.86255,0.33723l2.73745,2.73717l2.73717,-2.73717c0.2352,-0.23403 0.55563,-0.33723 0.86283,-0.33723c0.3072,0 0.62763,0.1032 0.86283,0.33723c0.468,0.46917 0.468,1.25637 0,1.72554l-2.73723,2.73723l2.73723,2.73723c0.468,0.46917 0.468,1.25637 0,1.72554c-0.46923,0.468 -1.25643,0.468 -1.72565,0l-2.73717,-2.73717l-2.73745,2.73717c-0.46856,0.468 -1.25637,0.468 -1.7251,0c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554l2.73695,-2.73723l-2.73695,-2.73723c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554c0.23447,-0.23403 0.55546,-0.33723 0.86255,-0.33723z"></path>
+				<path class="close" fill="#565758" d="m12,0c-6.62736,0 -12,5.3724 -12,12c0,6.62763 5.37264,12 12,12c6.62763,0 12,-5.37237 12,-12c0,-6.6276 -5.37237,-12 -12,-12zm-3.6,7.2c0.30698,0 0.62819,0.1032 0.86255,0.33723l2.73745,2.73717l2.73717,-2.73717c0.2352,-0.23403 0.55563,-0.33723 0.86283,-0.33723c0.3072,0 0.62763,0.1032 0.86283,0.33723c0.468,0.46917 0.468,1.25637 0,1.72554l-2.73723,2.73723l2.73723,2.73723c0.468,0.46917 0.468,1.25637 0,1.72554c-0.46923,0.468 -1.25643,0.468 -1.72565,0l-2.73717,-2.73717l-2.73745,2.73717c-0.46856,0.468 -1.25637,0.468 -1.7251,0c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554l2.73695,-2.73723l-2.73695,-2.73723c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554c0.23447,-0.23403 0.55546,-0.33723 0.86255,-0.33723z"></path>
 			</svg>
         <h2>
           WORDLE'i 6 denemede bulun.
@@ -69,8 +77,27 @@ const errorElement = document.querySelector(".error");
 
 //close btn for  the pop-up
 window.addEventListener("click", (e) => {
-	if (e.target.classList.contains("close") || e.target.tagName == "path") {
+	if (e.target.classList.contains("close")) {
 		popupWrapper.classList.remove("animate");
+		resultElement.classList.add("none");
+	}
+	if (e.target.classList.contains("replay")) {
+		window.location.reload();
+	} else if (e.target.classList.contains("share")) {
+		let generetedString = new Array(6)
+			.fill("")
+			.map((el, i) => {
+				if (i < row + 1) return "🟥";
+				if (i == row + 1) return "🟩";
+				return "⬛️";
+			})
+			.join("");
+
+		let copyString = `Wordle Türkçe ${
+			row + 1
+		}/6 \n\nhttps://wordle-clone-2-hazel.vercel.app/\n\n${generetedString}`;
+
+		navigator.clipboard.writeText(copyString);
 	}
 });
 
@@ -103,99 +130,32 @@ function updateAndCreateTable(table, currentStep = null) {
 	}
 }
 
-//game variable
-let row = 0;
-let tile = 0;
-let guessWord =
-	data[Math.floor(Math.random() * data.length)].toLocaleUpperCase("tr");
-let isGameFinished = false;
-console.log(guessWord);
-
 //actions when window loaded
 window.addEventListener("load", (e) => {
 	updateAndCreateTable(table);
 
-	if (!isGameFinished) {
-		//click event
-		keyboard.addEventListener("click", (e) => {
-			if (e.target.tagName == "BUTTON" || e.target.tagName == "svg") {
-				let val = e.target.textContent.trim().length
-					? e.target.textContent
-					: "Delete";
+	//click event
+	keyboard.addEventListener("click", (e) => {
+		if (e.target.tagName == "BUTTON" || e.target.tagName == "svg") {
+			let val = e.target.textContent.trim().length
+				? e.target.textContent
+				: "Delete";
 
-				if (tile > 5) {
-					tile = 5;
-				}
-
-				if (tile < 5 && val == "Enter") {
-					shakeAnimation(row);
-					errorElement.classList.remove("none");
-					errorElement.textContent = "Yetersiz Harf";
-					setTimeout(() => {
-						errorElement.classList.add("none");
-					}, 1000);
-					return;
-				}
-
-				if (tile > 4 && val == "Enter") {
-					let word = virtualCopy[row]
-						.map(({ value }) => value)
-						.join("")
-						.slice(0, 5)
-						.toLocaleLowerCase("tr");
-
-					if (data.includes(word)) {
-						updateAndCreateTable(check(row), row);
-						if (gameIsOver(row)) {
-							isGameFinished = true;
-							return;
-						}
-						tile = 0;
-						row++;
-					} else {
-						shakeAnimation(row);
-						errorElement.classList.remove("none");
-						errorElement.textContent = "Kelime Listede Yok";
-						setTimeout(() => {
-							errorElement.classList.add("none");
-						}, 1000);
-					}
-				} else if (val == "Delete" && tile > 0) {
-					updateAndCreateTable(handleDelete(tile));
-					tile--;
-				} else {
-					if (val !== "Delete") {
-						updateAndCreateTable(handleInput(val));
-						tile++;
-					}
-				}
-			}
-		});
-
-		//keyboard event
-		window.addEventListener("keydown", (e) => {
 			if (tile > 5) {
 				tile = 5;
 			}
 
-			if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
-				return;
-			}
-
-			if (tile < 5 && e.key == "Enter") {
+			if (tile < 5 && val == "Enter" && !isGameFinished) {
 				shakeAnimation(row);
 				errorElement.classList.remove("none");
 				errorElement.textContent = "Yetersiz Harf";
 				setTimeout(() => {
 					errorElement.classList.add("none");
 				}, 1000);
-
-				//add shake animation
-
 				return;
 			}
 
-			if (tile > 4 && e.key == "Enter") {
+			if (tile > 4 && val == "Enter" && !isGameFinished) {
 				let word = virtualCopy[row]
 					.map(({ value }) => value)
 					.join("")
@@ -205,6 +165,14 @@ window.addEventListener("load", (e) => {
 				if (data.includes(word)) {
 					updateAndCreateTable(check(row), row);
 					if (gameIsOver(row)) {
+						//oyun sonu ekranını göster
+						handleResult(row);
+						isGameFinished = true;
+						return;
+					}
+					if (row == 5) {
+						// burada oyun sonu ekranını göster
+						handleResult(row);
 						isGameFinished = true;
 						return;
 					}
@@ -218,17 +186,80 @@ window.addEventListener("load", (e) => {
 						errorElement.classList.add("none");
 					}, 1000);
 				}
-			} else if (e.key == "Backspace" && tile > 0) {
+			} else if (val == "Delete" && tile > 0 && !isGameFinished) {
 				updateAndCreateTable(handleDelete(tile));
 				tile--;
 			} else {
-				if (e.key !== "Backspace") {
-					updateAndCreateTable(handleInput(e.key.toLocaleUpperCase("tr")));
+				if (val !== "Delete") {
+					updateAndCreateTable(handleInput(val));
 					tile++;
 				}
 			}
-		});
-	}
+		}
+	});
+
+	//keyboard event
+	window.addEventListener("keydown", (e) => {
+		if (tile > 5) {
+			tile = 5;
+		}
+
+		if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
+			return;
+		}
+
+		if (tile < 5 && e.key == "Enter") {
+			shakeAnimation(row);
+			errorElement.classList.remove("none");
+			errorElement.textContent = "Yetersiz Harf";
+			setTimeout(() => {
+				errorElement.classList.add("none");
+			}, 1000);
+			return;
+		}
+
+		if (tile > 4 && e.key == "Enter" && !isGameFinished) {
+			let word = virtualCopy[row]
+				.map(({ value }) => value)
+				.join("")
+				.slice(0, 5)
+				.toLocaleLowerCase("tr");
+
+			if (data.includes(word)) {
+				updateAndCreateTable(check(row), row);
+				if (gameIsOver(row)) {
+					// burada oyun sonu ekranını göster
+					handleResult(row);
+					isGameFinished = true;
+					return;
+				}
+				if (row == 5) {
+					// burada oyun sonu ekranını göster
+					handleResult(row);
+					console.log("oyun bitti");
+					isGameFinished = true;
+					return;
+				}
+				row++;
+				tile = 0;
+			} else {
+				shakeAnimation(row);
+				errorElement.classList.remove("none");
+				errorElement.textContent = "Kelime Listede Yok";
+				setTimeout(() => {
+					errorElement.classList.add("none");
+				}, 1000);
+			}
+		} else if (e.key == "Backspace" && tile > 0 && !isGameFinished) {
+			updateAndCreateTable(handleDelete(tile));
+			tile--;
+		} else {
+			if (e.key !== "Backspace") {
+				updateAndCreateTable(handleInput(e.key.toLocaleUpperCase("tr")));
+				tile++;
+			}
+		}
+	});
 });
 
 //check is word is true
@@ -326,4 +357,28 @@ function spinAnimate(row) {
 function shakeAnimation(row) {
 	document.querySelectorAll(`.board .wrapper`)[row].style.animation =
 		"shake 200ms ease";
+}
+
+function handleResult(step) {
+	resultElement.classList.remove("none");
+	resultElement.innerHTML = `
+	<div>
+	<svg class="close" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
+		<path class="close" fill="#565758"
+			d="m12,0c-6.62736,0 -12,5.3724 -12,12c0,6.62763 5.37264,12 12,12c6.62763,0 12,-5.37237 12,-12c0,-6.6276 -5.37237,-12 -12,-12zm-3.6,7.2c0.30698,0 0.62819,0.1032 0.86255,0.33723l2.73745,2.73717l2.73717,-2.73717c0.2352,-0.23403 0.55563,-0.33723 0.86283,-0.33723c0.3072,0 0.62763,0.1032 0.86283,0.33723c0.468,0.46917 0.468,1.25637 0,1.72554l-2.73723,2.73723l2.73723,2.73723c0.468,0.46917 0.468,1.25637 0,1.72554c-0.46923,0.468 -1.25643,0.468 -1.72565,0l-2.73717,-2.73717l-2.73745,2.73717c-0.46856,0.468 -1.25637,0.468 -1.7251,0c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554l2.73695,-2.73723l-2.73695,-2.73723c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554c0.23447,-0.23403 0.55546,-0.33723 0.86255,-0.33723z">
+		</path>
+	</svg>
+	<h2> Sonuç : ${step + 1}/6  ${gameIsOver(step) ? "" : guessWord}</h2>
+	<div class="buttons">
+		<button class="replay">Yeniden Oyna</button>
+		<button class="share">Paylaş
+			<svg class="share" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
+				<path class="share" fill="#fff"
+					d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zM18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z">
+				</path>
+			</svg>
+	</div>
+
+	</button>
+	</div>`;
 }
