@@ -99,6 +99,7 @@ body>main {
 }
 
 .result>div {
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3);
   padding: 2rem 2.5rem;
   position: relative;
   color: #d7dadc;
