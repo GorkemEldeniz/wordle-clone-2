@@ -82,7 +82,7 @@ let table = new Array(6)
 let virtualCopy = table.slice();
 
 //implement table
-function updateAndCreateTable(table) {
+function updateAndCreateTable(table, currentStep = null) {
 	board.innerHTML = "";
 	for (let row = 0; row < table.length; row++) {
 		let wrapper = document.createElement("div");
@@ -97,10 +97,13 @@ function updateAndCreateTable(table) {
 		}
 		board.appendChild(wrapper);
 	}
+
+	if (typeof currentStep == "number") {
+		spinAnimate(currentStep);
+	}
 }
 
-updateAndCreateTable(table);
-
+//game variable
 let row = 0;
 let tile = 0;
 let guessWord =
@@ -108,27 +111,91 @@ let guessWord =
 let isGameFinished = false;
 console.log(guessWord);
 
-if (!isGameFinished) {
-	keyboard.addEventListener("click", (e) => {
-		if (e.target.tagName == "BUTTON" || e.target.tagName == "svg") {
-			let val = e.target.textContent.trim().length
-				? e.target.textContent
-				: "Delete";
+//actions when window loaded
+window.addEventListener("load", (e) => {
+	updateAndCreateTable(table);
 
+	if (!isGameFinished) {
+		//click event
+		keyboard.addEventListener("click", (e) => {
+			if (e.target.tagName == "BUTTON" || e.target.tagName == "svg") {
+				let val = e.target.textContent.trim().length
+					? e.target.textContent
+					: "Delete";
+
+				if (tile > 5) {
+					tile = 5;
+				}
+
+				if (tile < 5 && val == "Enter") {
+					shakeAnimation(row);
+					errorElement.classList.remove("none");
+					errorElement.textContent = "Yetersiz Harf";
+					setTimeout(() => {
+						errorElement.classList.add("none");
+					}, 1000);
+					return;
+				}
+
+				if (tile > 4 && val == "Enter") {
+					let word = virtualCopy[row]
+						.map(({ value }) => value)
+						.join("")
+						.slice(0, 5)
+						.toLocaleLowerCase("tr");
+
+					if (data.includes(word)) {
+						updateAndCreateTable(check(row), row);
+						if (gameIsOver(row)) {
+							isGameFinished = true;
+							return;
+						}
+						tile = 0;
+						row++;
+					} else {
+						shakeAnimation(row);
+						errorElement.classList.remove("none");
+						errorElement.textContent = "Kelime Listede Yok";
+						setTimeout(() => {
+							errorElement.classList.add("none");
+						}, 1000);
+					}
+				} else if (val == "Delete" && tile > 0) {
+					updateAndCreateTable(handleDelete(tile));
+					tile--;
+				} else {
+					if (val !== "Delete") {
+						updateAndCreateTable(handleInput(val));
+						tile++;
+					}
+				}
+			}
+		});
+
+		//keyboard event
+		window.addEventListener("keydown", (e) => {
 			if (tile > 5) {
 				tile = 5;
 			}
 
-			if (tile < 5 && val == "Enter") {
+			if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
+				return;
+			}
+
+			if (tile < 5 && e.key == "Enter") {
+				shakeAnimation(row);
 				errorElement.classList.remove("none");
 				errorElement.textContent = "Yetersiz Harf";
 				setTimeout(() => {
 					errorElement.classList.add("none");
 				}, 1000);
+
+				//add shake animation
+
 				return;
 			}
 
-			if (tile > 4 && val == "Enter") {
+			if (tile > 4 && e.key == "Enter") {
 				let word = virtualCopy[row]
 					.map(({ value }) => value)
 					.join("")
@@ -136,78 +203,33 @@ if (!isGameFinished) {
 					.toLocaleLowerCase("tr");
 
 				if (data.includes(word)) {
-					updateAndCreateTable(check(row));
+					updateAndCreateTable(check(row), row);
 					if (gameIsOver(row)) {
 						isGameFinished = true;
 						return;
 					}
 					tile = 0;
 					row++;
+				} else {
+					shakeAnimation(row);
+					errorElement.classList.remove("none");
+					errorElement.textContent = "Kelime Listede Yok";
+					setTimeout(() => {
+						errorElement.classList.add("none");
+					}, 1000);
 				}
-			} else if (val == "Delete" && tile > 0) {
+			} else if (e.key == "Backspace" && tile > 0) {
 				updateAndCreateTable(handleDelete(tile));
 				tile--;
 			} else {
-				if (val !== "Delete") {
-					updateAndCreateTable(handleInput(val));
+				if (e.key !== "Backspace") {
+					updateAndCreateTable(handleInput(e.key.toLocaleUpperCase("tr")));
 					tile++;
 				}
 			}
-		}
-	});
-
-	window.addEventListener("keydown", (e) => {
-		if (tile > 5) {
-			tile = 5;
-		}
-
-		if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
-			return;
-		}
-
-		if (tile < 5 && e.key == "Enter") {
-			errorElement.classList.remove("none");
-			errorElement.textContent = "Yetersiz Harf";
-			setTimeout(() => {
-				errorElement.classList.add("none");
-			}, 1000);
-			return;
-		}
-
-		if (tile > 4 && e.key == "Enter") {
-			let word = virtualCopy[row]
-				.map(({ value }) => value)
-				.join("")
-				.slice(0, 5)
-				.toLocaleLowerCase("tr");
-
-			if (data.includes(word)) {
-				updateAndCreateTable(check(row));
-				if (gameIsOver(row)) {
-					isGameFinished = true;
-					return;
-				}
-				tile = 0;
-				row++;
-			} else {
-				errorElement.classList.remove("none");
-				errorElement.textContent = "Kelime Listede Yok";
-				setTimeout(() => {
-					errorElement.classList.add("none");
-				}, 1000);
-				return;
-			}
-		} else if (e.key == "Backspace" && tile > 0) {
-			updateAndCreateTable(handleDelete(tile));
-			tile--;
-		} else {
-			if (e.key !== "Backspace") {
-				updateAndCreateTable(handleInput(e.key.toLocaleUpperCase("tr")));
-				tile++;
-			}
-		}
-	});
-}
+		});
+	}
+});
 
 //check is word is true
 function check(row) {
@@ -232,6 +254,7 @@ function check(row) {
 		};
 	});
 
+	//virtual keyboard change color events
 	[...buttons].map((button, index) => {
 		let ar = signedLetters.filter(({ value }) => value == button.textContent);
 		if (ar.length && !button.classList.contains("correct")) {
@@ -284,4 +307,23 @@ function handleDelete(step) {
 	});
 	virtualCopy = newTable.slice();
 	return newTable;
+}
+
+//spin animation
+function spinAnimate(row) {
+	[
+		...document
+			.querySelectorAll(`.board .wrapper`)
+			[row].querySelectorAll(".cell"),
+	].map((el, i) => {
+		setTimeout(() => {
+			el.style.animation = "spin 400ms ease";
+		}, i * 100);
+	});
+}
+
+//shake animation
+function shakeAnimation(row) {
+	document.querySelectorAll(`.board .wrapper`)[row].style.animation =
+		"shake 200ms ease";
 }
