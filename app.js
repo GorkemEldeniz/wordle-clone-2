@@ -2,8 +2,8 @@ const board = document.querySelector(".board");
 const keyboard = document.querySelector(".keyboard");
 import data from "./words.js";
 const menuButtons = document.querySelectorAll(".menu  button");
-//const container = document.querySelector("body > main");
 const popupWrapper = document.querySelector(".popup");
+const errorElement = document.querySelector(".error");
 
 //menu buttons actions
 [...menuButtons].map((btn, index) => {
@@ -105,10 +105,10 @@ let row = 0;
 let tile = 0;
 let guessWord =
 	data[Math.floor(Math.random() * data.length)].toLocaleUpperCase("tr");
-let isGameFinsished = false;
+let isGameFinished = false;
 console.log(guessWord);
 
-if (!isGameFinsished) {
+if (!isGameFinished) {
 	keyboard.addEventListener("click", (e) => {
 		if (e.target.tagName == "BUTTON" || e.target.tagName == "svg") {
 			let val = e.target.textContent.trim().length
@@ -120,6 +120,11 @@ if (!isGameFinsished) {
 			}
 
 			if (tile < 5 && val == "Enter") {
+				errorElement.classList.remove("none");
+				errorElement.textContent = "Yetersiz Harf";
+				setTimeout(() => {
+					errorElement.classList.add("none");
+				}, 1000);
 				return;
 			}
 
@@ -133,7 +138,7 @@ if (!isGameFinsished) {
 				if (data.includes(word)) {
 					updateAndCreateTable(check(row));
 					if (gameIsOver(row)) {
-						isGameFinsished = true;
+						isGameFinished = true;
 						return;
 					}
 					tile = 0;
@@ -161,6 +166,11 @@ if (!isGameFinsished) {
 		}
 
 		if (tile < 5 && e.key == "Enter") {
+			errorElement.classList.remove("none");
+			errorElement.textContent = "Yetersiz Harf";
+			setTimeout(() => {
+				errorElement.classList.add("none");
+			}, 1000);
 			return;
 		}
 
@@ -174,11 +184,18 @@ if (!isGameFinsished) {
 			if (data.includes(word)) {
 				updateAndCreateTable(check(row));
 				if (gameIsOver(row)) {
-					isGameFinsished = true;
+					isGameFinished = true;
 					return;
 				}
 				tile = 0;
 				row++;
+			} else {
+				errorElement.classList.remove("none");
+				errorElement.textContent = "Kelime Listede Yok";
+				setTimeout(() => {
+					errorElement.classList.add("none");
+				}, 1000);
+				return;
 			}
 		} else if (e.key == "Backspace" && tile > 0) {
 			updateAndCreateTable(handleDelete(tile));
@@ -243,7 +260,10 @@ function gameIsOver(row) {
 function handleInput(letter) {
 	let newTable = virtualCopy.map((el, index) => {
 		if (index == row) {
-			el[tile] = { value: letter, state: "" };
+			el[tile] = {
+				value: letter,
+				state: "",
+			};
 		}
 		return el;
 	});
@@ -255,7 +275,10 @@ function handleInput(letter) {
 function handleDelete(step) {
 	let newTable = virtualCopy.map((el, index) => {
 		if (index == row) {
-			el[step - 1] = { value: "", state: "" };
+			el[step - 1] = {
+				value: "",
+				state: "",
+			};
 		}
 		return el;
 	});
