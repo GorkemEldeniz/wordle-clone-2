@@ -75,8 +75,6 @@ let isGameFinished = false;
 	});
 });
 
-console.log(guessWord);
-
 //close btn for  the pop-up
 window.addEventListener("click", (e) => {
 	if (e.target.classList.contains("close")) {
