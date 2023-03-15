@@ -84,14 +84,16 @@ window.addEventListener("click", (e) => {
 	if (e.target.classList.contains("replay")) {
 		window.location.reload();
 	} else if (e.target.classList.contains("share")) {
-		let generetedString = new Array(6)
-			.fill("")
-			.map((el, i) => {
-				if (i < row + 1) return "🟥";
-				if (i == row + 1) return "🟩";
-				return "⬛️";
-			})
-			.join("");
+		let generetedString = gameIsOver(row)
+			? new Array(6)
+					.fill("")
+					.map((el, i) => {
+						if (i < row) return "🟥";
+						if (i == row) return "🟩";
+						return "⬛️";
+					})
+					.join("")
+			: "🟥🟥🟥🟥🟥🟥";
 
 		let copyString = `Wordle Türkçe ${
 			row + 1
@@ -100,6 +102,8 @@ window.addEventListener("click", (e) => {
 		navigator.clipboard.writeText(copyString);
 	}
 });
+
+console.log(guessWord);
 
 //create table
 let table = new Array(6)

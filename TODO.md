@@ -1,7 +1,5 @@
-[x] kazanıp kaybetme ekranı yapılacak...
-Wordle Türkçe 634 1/6
+Wordle Türkçe 6/6 
 
-🟩🟩🟩🟩🟩
+https://wordle-clone-2-hazel.vercel.app/
 
-https://wordleturkce.bundle.app/
-
+🟥🟥🟥🟥🟥🟥
