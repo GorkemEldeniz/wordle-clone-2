@@ -100,6 +100,12 @@ window.addEventListener("click", (e) => {
 		}/6 \n\nhttps://wordle-clone-2-hazel.vercel.app/\n\n${generetedString}`;
 
 		navigator.clipboard.writeText(copyString);
+		//popup copied clipboard
+		errorElement.classList.remove("none");
+		errorElement.textContent = "Panoya Kopyalandı";
+		setTimeout(() => {
+			errorElement.classList.add("none");
+		}, 1000);
 	}
 });
 

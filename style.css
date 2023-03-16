@@ -60,6 +60,7 @@ body>main {
   border-radius: 2rem;
   top: 5%;
   left: 50%;
+  z-index: 999;
   font-weight: bold;
   transform: translateX(-49%);
   transition-delay: 200ms;
