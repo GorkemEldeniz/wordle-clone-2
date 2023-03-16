@@ -109,8 +109,6 @@ window.addEventListener("click", (e) => {
 	}
 });
 
-console.log(guessWord);
-
 //create table
 let table = new Array(6)
 	.fill("")
