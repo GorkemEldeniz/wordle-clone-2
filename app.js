@@ -6,12 +6,31 @@ const popupWrapper = document.querySelector(".popup");
 const errorElement = document.querySelector(".error");
 const resultElement = document.querySelector(".result");
 
+async function newDay() {
+	let res = await fetch("https://wordle-db.vercel.app/");
+	res = await res.json();
+	return res
+		.find(({ date }) => date == new Date().toDateString())
+		.word.toLocaleUpperCase();
+}
+
+function resetLocalStorage(newWord) {
+	localStorage.setItem(
+		"gameState",
+		JSON.stringify({
+			tile: 0,
+			row: 0,
+			table: new Array(6)
+				.fill("")
+				.map((el) => new Array(5).fill({ value: "", state: "" })),
+			guessWord: newWord,
+			isGameFinished: false,
+		})
+	);
+}
+
 //game variable
-let row = 0;
-let tile = 0;
-let guessWord =
-	data[Math.floor(Math.random() * data.length)].toLocaleUpperCase("tr");
-let isGameFinished = false;
+let guessWord, row, tile, table, currentDay, isGameFinished, virtualCopy;
 
 //menu buttons actions
 [...menuButtons].map((btn, index) => {
@@ -109,37 +128,38 @@ window.addEventListener("click", (e) => {
 	}
 });
 
-//create table
-let table = new Array(6)
-	.fill("")
-	.map((el) => new Array(5).fill({ value: "", state: "" }));
-
-let virtualCopy = table.slice();
-
-//implement table
-function updateAndCreateTable(table, currentStep = null) {
-	board.innerHTML = "";
-	for (let row = 0; row < table.length; row++) {
-		let wrapper = document.createElement("div");
-		wrapper.classList.add("wrapper");
-		for (let tile = 0; tile < 5; tile++) {
-			let cell = document.createElement("span");
-			let { value, state } = table[row][tile];
-			cell.classList.add("cell");
-			cell.textContent = value;
-			cell.dataset.state = state;
-			wrapper.appendChild(cell);
-		}
-		board.appendChild(wrapper);
-	}
-
-	if (typeof currentStep == "number") {
-		spinAnimate(currentStep);
-	}
-}
-
 //actions when window loaded
-window.addEventListener("load", (e) => {
+window.addEventListener("load", async (e) => {
+	let newWord = await newDay();
+	row = JSON.parse(localStorage.getItem("gameState"))?.row || 0;
+	tile = JSON.parse(localStorage.getItem("gameState"))?.tile || 0;
+	isGameFinished =
+		JSON.parse(localStorage.getItem("gameState"))?.isGameFinished || false;
+	table =
+		JSON.parse(localStorage.getItem("gameState"))?.table ||
+		new Array(6)
+			.fill("")
+			.map((el) => new Array(5).fill({ value: "", state: "" }));
+
+	// currentDay
+	currentDay = new Date().toDateString();
+	if (JSON.parse(localStorage.getItem("gameState"))?.guessWord == newWord) {
+		guessWord = JSON.parse(localStorage.getItem("gameState"))?.guessWord;
+	} else resetLocalStorage(newWord);
+
+	virtualCopy = table.slice();
+
+	//reset game if it is over
+	if (isGameFinished) {
+		for (let i = 0; i <= row; i++) {
+			updateAndCreateTable(check(i), i);
+		}
+		setTimeout(() => {
+			handleResult(row);
+		}, 1000);
+		return;
+	}
+
 	updateAndCreateTable(table);
 
 	//click event
@@ -176,12 +196,35 @@ window.addEventListener("load", (e) => {
 						//oyun sonu ekranını göster
 						handleResult(row);
 						isGameFinished = true;
+						//update localstorage
+						localStorage.setItem(
+							"gameState",
+							JSON.stringify({
+								tile,
+								row,
+								table,
+								guessWord,
+								isGameFinished,
+							})
+						);
+
 						return;
 					}
 					if (row == 5) {
 						// burada oyun sonu ekranını göster
 						handleResult(row);
 						isGameFinished = true;
+						//update localstorage
+						localStorage.setItem(
+							"gameState",
+							JSON.stringify({
+								tile,
+								row,
+								table,
+								guessWord,
+								isGameFinished,
+							})
+						);
 						return;
 					}
 					tile = 0;
@@ -239,6 +282,20 @@ window.addEventListener("load", (e) => {
 					// burada oyun sonu ekranını göster
 					handleResult(row);
 					isGameFinished = true;
+					console.log("calisti");
+					//update localstorage
+					const currentDay = new Date().toDateString();
+					localStorage.setItem(
+						"gameState",
+						JSON.stringify({
+							tile,
+							row,
+							table,
+							guessWord,
+							isGameFinished,
+							currentDay,
+						})
+					);
 					return;
 				}
 				if (row == 5) {
@@ -246,6 +303,17 @@ window.addEventListener("load", (e) => {
 					handleResult(row);
 					console.log("oyun bitti");
 					isGameFinished = true;
+					//update localstorage
+					localStorage.setItem(
+						"gameState",
+						JSON.stringify({
+							tile,
+							row,
+							table,
+							guessWord,
+							isGameFinished,
+						})
+					);
 					return;
 				}
 				row++;
@@ -269,6 +337,28 @@ window.addEventListener("load", (e) => {
 		}
 	});
 });
+
+//implement table
+function updateAndCreateTable(table, currentStep = null) {
+	board.innerHTML = "";
+	for (let row = 0; row < table.length; row++) {
+		let wrapper = document.createElement("div");
+		wrapper.classList.add("wrapper");
+		for (let tile = 0; tile < 5; tile++) {
+			let cell = document.createElement("span");
+			let { value, state } = table[row][tile];
+			cell.classList.add("cell");
+			cell.textContent = value;
+			cell.dataset.state = state;
+			wrapper.appendChild(cell);
+		}
+		board.appendChild(wrapper);
+	}
+
+	if (typeof currentStep == "number") {
+		spinAnimate(currentStep);
+	}
+}
 
 //check is word is true
 function check(row) {
