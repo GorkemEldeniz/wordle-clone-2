@@ -5,6 +5,7 @@ const menuButtons = document.querySelectorAll(".menu  button");
 const popupWrapper = document.querySelector(".popup");
 const errorElement = document.querySelector(".error");
 const resultElement = document.querySelector(".result");
+const loader = document.querySelector(".loader");
 
 async function newDay() {
 	let res = await fetch("https://wordle-db.vercel.app/");
@@ -27,6 +28,7 @@ function resetLocalStorage(newWord) {
 			isGameFinished: false,
 		})
 	);
+	guessWord = JSON.parse(localStorage.getItem("gameState"))?.guessWord;
 }
 
 //game variable
@@ -131,6 +133,7 @@ window.addEventListener("click", (e) => {
 //actions when window loaded
 window.addEventListener("load", async (e) => {
 	let newWord = await newDay();
+	loader.classList.add("none");
 	row = JSON.parse(localStorage.getItem("gameState"))?.row || 0;
 	tile = JSON.parse(localStorage.getItem("gameState"))?.tile || 0;
 	isGameFinished =
@@ -279,10 +282,9 @@ window.addEventListener("load", async (e) => {
 			if (data.includes(word)) {
 				updateAndCreateTable(check(row), row);
 				if (gameIsOver(row)) {
-					// burada oyun sonu ekranını göster
+					// show the end game screen
 					handleResult(row);
 					isGameFinished = true;
-					console.log("calisti");
 					//update localstorage
 					const currentDay = new Date().toDateString();
 					localStorage.setItem(
@@ -299,9 +301,8 @@ window.addEventListener("load", async (e) => {
 					return;
 				}
 				if (row == 5) {
-					// burada oyun sonu ekranını göster
+					// show the end game screen
 					handleResult(row);
-					console.log("oyun bitti");
 					isGameFinished = true;
 					//update localstorage
 					localStorage.setItem(
@@ -457,30 +458,55 @@ function shakeAnimation(row) {
 		"shake 200ms ease";
 }
 
+//countdown timer
+function countDownTimer() {
+	const currentDate = new Date();
+	const tomorrowDate = new Date();
+
+	tomorrowDate.setDate(currentDate.getDate() + 1);
+	tomorrowDate.setHours(0, 0, 0, 0);
+
+	let timeLeft = tomorrowDate - currentDate;
+
+	const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+	const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+	const seconds = Math.floor((timeLeft / 1000) % 60);
+
+	return `${hours < 10 ? "0" + hours : hours}:${
+		minutes < 10 ? "0" + minutes : minutes
+	}:${seconds < 10 ? "0" + seconds : seconds}`;
+}
+
 function handleResult(step) {
 	resultElement.classList.remove("none");
-	resultElement.innerHTML = `
-	<div>
-	<svg class="close" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
-		<path class="close" fill="#565758"
-			d="m12,0c-6.62736,0 -12,5.3724 -12,12c0,6.62763 5.37264,12 12,12c6.62763,0 12,-5.37237 12,-12c0,-6.6276 -5.37237,-12 -12,-12zm-3.6,7.2c0.30698,0 0.62819,0.1032 0.86255,0.33723l2.73745,2.73717l2.73717,-2.73717c0.2352,-0.23403 0.55563,-0.33723 0.86283,-0.33723c0.3072,0 0.62763,0.1032 0.86283,0.33723c0.468,0.46917 0.468,1.25637 0,1.72554l-2.73723,2.73723l2.73723,2.73723c0.468,0.46917 0.468,1.25637 0,1.72554c-0.46923,0.468 -1.25643,0.468 -1.72565,0l-2.73717,-2.73717l-2.73745,2.73717c-0.46856,0.468 -1.25637,0.468 -1.7251,0c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554l2.73695,-2.73723l-2.73695,-2.73723c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554c0.23447,-0.23403 0.55546,-0.33723 0.86255,-0.33723z">
-		</path>
-	</svg>
-	<h2>  ${
-		gameIsOver(step)
-			? "Tebrikler " + (step + 1) + " adımda bildiniz"
-			: "<br/><br/>" + "Kelime :" + guessWord
-	}</h2>
-	<div class="buttons">
-		<button class="replay">Yeniden Oyna</button>
-		<button class="share">Paylaş
-			<svg class="share" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
-				<path class="share" fill="#fff"
-					d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zM18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z">
-				</path>
-			</svg>
-	</div>
 
-	</button>
-	</div>`;
+	setInterval(() => {
+		resultElement.innerHTML = `
+		<div>
+		<svg class="close" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
+			<path class="close" fill="#565758"
+				d="m12,0c-6.62736,0 -12,5.3724 -12,12c0,6.62763 5.37264,12 12,12c6.62763,0 12,-5.37237 12,-12c0,-6.6276 -5.37237,-12 -12,-12zm-3.6,7.2c0.30698,0 0.62819,0.1032 0.86255,0.33723l2.73745,2.73717l2.73717,-2.73717c0.2352,-0.23403 0.55563,-0.33723 0.86283,-0.33723c0.3072,0 0.62763,0.1032 0.86283,0.33723c0.468,0.46917 0.468,1.25637 0,1.72554l-2.73723,2.73723l2.73723,2.73723c0.468,0.46917 0.468,1.25637 0,1.72554c-0.46923,0.468 -1.25643,0.468 -1.72565,0l-2.73717,-2.73717l-2.73745,2.73717c-0.46856,0.468 -1.25637,0.468 -1.7251,0c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554l2.73695,-2.73723l-2.73695,-2.73723c-0.46861,-0.46917 -0.46861,-1.25637 0,-1.72554c0.23447,-0.23403 0.55546,-0.33723 0.86255,-0.33723z">
+			</path>
+		</svg>
+		<h2>  ${
+			gameIsOver(step)
+				? "Tebrikler " + (step + 1) + " adımda bildiniz"
+				: "Kelime :" + guessWord
+		}</h2>
+		<div class="buttons">
+			<div class="count-down">
+				Sonraki Wordle <br/>
+				${countDownTimer()}
+			</div>
+			<button class="share">Paylaş
+				<svg class="share" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20">
+					<path class="share" fill="#fff"
+						d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zM18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z">
+					</path>
+				</svg>
+		</div>
+	
+		</button>
+		</div>`;
+	}, 1000);
 }
