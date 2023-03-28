@@ -7,6 +7,10 @@ const errorElement = document.querySelector(".error");
 const resultElement = document.querySelector(".result");
 const loader = document.querySelector(".loader");
 
+window.addEventListener("dblclick", (e) => {
+	e.preventDefault();
+});
+
 async function newDay() {
 	let res = await fetch("https://wordle-db.vercel.app/");
 	res = await res.json();
