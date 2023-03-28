@@ -26,6 +26,7 @@ function resetLocalStorage(newWord) {
 				.map((el) => new Array(5).fill({ value: "", state: "" })),
 			guessWord: newWord,
 			isGameFinished: false,
+			currentDay: new Date().toDateString(),
 		})
 	);
 	guessWord = JSON.parse(localStorage.getItem("gameState"))?.guessWord;
@@ -134,6 +135,12 @@ window.addEventListener("click", (e) => {
 window.addEventListener("load", async (e) => {
 	let newWord = await newDay();
 	loader.classList.add("none");
+
+	//check the data from api
+	if (JSON.parse(localStorage.getItem("gameState"))?.guessWord == newWord) {
+		guessWord = JSON.parse(localStorage.getItem("gameState"))?.guessWord;
+	} else resetLocalStorage(newWord);
+
 	row = JSON.parse(localStorage.getItem("gameState"))?.row || 0;
 	tile = JSON.parse(localStorage.getItem("gameState"))?.tile || 0;
 	isGameFinished =
@@ -145,11 +152,9 @@ window.addEventListener("load", async (e) => {
 			.map((el) => new Array(5).fill({ value: "", state: "" }));
 
 	// currentDay
-	currentDay = new Date().toDateString();
-	if (JSON.parse(localStorage.getItem("gameState"))?.guessWord == newWord) {
-		guessWord = JSON.parse(localStorage.getItem("gameState"))?.guessWord;
-	} else resetLocalStorage(newWord);
-
+	currentDay =
+		JSON.parse(localStorage.getItem("gameState"))?.currentDate ||
+		new Date().toDateString();
 	virtualCopy = table.slice();
 
 	//reset game if it is over
@@ -159,7 +164,7 @@ window.addEventListener("load", async (e) => {
 		}
 		setTimeout(() => {
 			handleResult(row);
-		}, 1000);
+		}, 200);
 		return;
 	}
 
@@ -471,6 +476,11 @@ function countDownTimer() {
 	const hours = Math.floor(timeLeft / (1000 * 60 * 60));
 	const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
 	const seconds = Math.floor((timeLeft / 1000) % 60);
+
+	// if timer equals = 00:00:00 then reload the page
+	if (hours == 0 && minutes == 0 && seconds == 0) {
+		window.location.reload();
+	}
 
 	return `${hours < 10 ? "0" + hours : hours}:${
 		minutes < 10 ? "0" + minutes : minutes
