@@ -16,7 +16,7 @@ async function newDay() {
 	res = await res.json();
 	return res
 		.find(({ date }) => date == new Date().toDateString())
-		.word.toLocaleUpperCase();
+		.word.toLocaleUpperCase("tr");
 }
 
 function resetLocalStorage(newWord) {
