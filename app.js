@@ -191,18 +191,20 @@ window.addEventListener("load", async (e) => {
 		new Date().toDateString();
 	virtualCopy = table.slice();
 
+	updateAndCreateTable(table);
+
+	//start game when it loads
+	for (let i = 0; i < row; i++) {
+		updateAndCreateTable(check(i), i);
+	}
+
 	//reset game if it is over
 	if (isGameFinished) {
-		for (let i = 0; i <= row; i++) {
-			updateAndCreateTable(check(i), i);
-		}
 		setTimeout(() => {
 			handleResult(row);
 		}, 200);
 		return;
 	}
-
-	updateAndCreateTable(table);
 
 	//click event
 	keyboard.addEventListener("click", (e) => {
@@ -238,7 +240,6 @@ window.addEventListener("load", async (e) => {
 						//oyun sonu ekranını göster
 						handleResult(row);
 						isGameFinished = true;
-						//update localstorage
 						updateStorage();
 						return;
 					}
@@ -246,12 +247,13 @@ window.addEventListener("load", async (e) => {
 						// burada oyun sonu ekranını göster
 						handleResult(row);
 						isGameFinished = true;
-						//update localstorage
 						updateStorage();
 						return;
 					}
+					//update localstorage
 					tile = 0;
 					row++;
+					updateStorage();
 				} else {
 					shakeAnimation(row);
 					errorElement.classList.remove("none");
@@ -320,6 +322,7 @@ window.addEventListener("load", async (e) => {
 				}
 				row++;
 				tile = 0;
+				updateStorage();
 			} else {
 				shakeAnimation(row);
 				errorElement.classList.remove("none");
@@ -342,12 +345,13 @@ window.addEventListener("load", async (e) => {
 
 //update local storage
 function updateStorage() {
+	console.log(virtualCopy);
 	localStorage.setItem(
 		"gameState",
 		JSON.stringify({
 			tile,
 			row,
-			table,
+			table: virtualCopy,
 			guessWord,
 			isGameFinished,
 		})
@@ -456,11 +460,21 @@ function handleDelete(step) {
 
 //spin animation
 function spinAnimate(row) {
-	[
-		...document
-			.querySelectorAll(`.board .wrapper`)
-			[row].querySelectorAll(".cell"),
-	].map((el, i) => {
+	let currentStepElement;
+	if (row == 4 || isGameFinished) {
+		currentStepElement = [
+			...document
+				.querySelectorAll(`.board .wrapper`)
+				[row + 1].querySelectorAll(".cell"),
+		];
+	} else {
+		currentStepElement = [
+			...document
+				.querySelectorAll(`.board .wrapper`)
+				[row].querySelectorAll(".cell"),
+		];
+	}
+	currentStepElement.map((el, i) => {
 		setTimeout(() => {
 			el.style.animation = "spin 400ms ease";
 		}, i * 100);
