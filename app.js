@@ -110,28 +110,26 @@ window.addEventListener("click", (e) => {
 	if (e.target.classList.contains("share")) {
 		console.log(virtualCopy);
 
-		let generetedString =
-			gameIsOver(row) &&
-			virtualCopy
-				.map((row, index) => {
-					return (
-						row
-							.map(({ state }) => {
-								if (!state) {
-									return "⬜️";
-								}
-								if (state == "absent") {
-									return "⬛️";
-								} else if (state == "present") {
-									return "🟨";
-								} else if (state == "correct") {
-									return "🟩";
-								}
-							})
-							.join("") + "\n"
-					);
-				})
-				.join("");
+		let generetedString = virtualCopy
+			.map((row, index) => {
+				return (
+					row
+						.map(({ state }) => {
+							if (!state) {
+								return "⬜️";
+							}
+							if (state == "absent") {
+								return "⬛️";
+							} else if (state == "present") {
+								return "🟨";
+							} else if (state == "correct") {
+								return "🟩";
+							}
+						})
+						.join("") + "\n"
+				);
+			})
+			.join("");
 
 		let copyString = `Wordle Türkçe ${
 			row + 1
