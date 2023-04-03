@@ -117,8 +117,7 @@ window.addEventListener("click", (e) => {
 						.map(({ state }) => {
 							if (!state) {
 								return "⬜️";
-							}
-							if (state == "absent") {
+							} else if (state == "absent") {
 								return "⬛️";
 							} else if (state == "present") {
 								return "🟨";
