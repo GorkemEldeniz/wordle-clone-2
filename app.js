@@ -356,7 +356,6 @@ window.addEventListener("load", async (e) => {
 
 //update local storage
 function updateStorage() {
-	console.log(virtualCopy);
 	localStorage.setItem(
 		"gameState",
 		JSON.stringify({
