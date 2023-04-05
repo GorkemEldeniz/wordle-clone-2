@@ -263,7 +263,8 @@ window.addEventListener("load", async (e) => {
 					}
 					//update localstorage
 					tile = 0;
-					row++;
+					//dont update row if its limited
+					row !== 4 ? row++ : row;
 					updateStorage();
 				} else {
 					shakeAnimation(row);
@@ -331,7 +332,7 @@ window.addEventListener("load", async (e) => {
 					updateStorage();
 					return;
 				}
-				row++;
+				row !== 4 ? row++ : row;
 				tile = 0;
 				updateStorage();
 			} else {
