@@ -108,8 +108,6 @@ window.addEventListener("click", (e) => {
 		resultElement.classList.add("none");
 	}
 	if (e.target.classList.contains("share")) {
-		console.log(virtualCopy);
-
 		let generetedString = virtualCopy
 			.map((row, index) => {
 				return (
