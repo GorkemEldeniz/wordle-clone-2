@@ -261,8 +261,7 @@ window.addEventListener("load", async (e) => {
 					}
 					//update localstorage
 					tile = 0;
-					//dont update row if its limited
-					row !== 4 ? row++ : row;
+					row++;
 					updateStorage();
 				} else {
 					shakeAnimation(row);
@@ -330,7 +329,7 @@ window.addEventListener("load", async (e) => {
 					updateStorage();
 					return;
 				}
-				row !== 4 ? row++ : row;
+				row++;
 				tile = 0;
 				updateStorage();
 			} else {
@@ -470,7 +469,7 @@ function handleDelete(step) {
 //spin animation
 function spinAnimate(row) {
 	let currentStepElement;
-	if (row == 4 || isGameFinished) {
+	if (isGameFinished) {
 		currentStepElement = [
 			...document
 				.querySelectorAll(`.board .wrapper`)
@@ -483,6 +482,7 @@ function spinAnimate(row) {
 				[row].querySelectorAll(".cell"),
 		];
 	}
+
 	currentStepElement.map((el, i) => {
 		setTimeout(() => {
 			el.style.animation = "spin 400ms ease";
