@@ -107,12 +107,13 @@ window.addEventListener("click", (e) => {
 		popupWrapper.classList.remove("animate");
 		resultElement.classList.add("none");
 	}
+
 	if (e.target.classList.contains("share")) {
 		let generetedString = virtualCopy
 			.map((row, index) => {
 				return (
 					row
-						.map(({ state }) => {
+						.map(({ state }, i) => {
 							if (!state) {
 								return "⬜️";
 							} else if (state == "absent") {
@@ -440,10 +441,12 @@ function gameIsOver(row) {
 function handleInput(letter) {
 	let newTable = virtualCopy.map((el, index) => {
 		if (index == row) {
-			el[tile] = {
-				value: letter,
-				state: "",
-			};
+			if (tile < 5) {
+				el[tile] = {
+					value: letter,
+					state: "",
+				};
+			}
 		}
 		return el;
 	});
