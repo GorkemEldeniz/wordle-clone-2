@@ -568,3 +568,10 @@ p {
     height: unset !important;
   }
 }
+
+/*telefon yan cevrildiği zaman ayarlar*/
+@media (max-width:900px) and (orientation: landscape) {
+  body {
+    overflow-y: auto;
+  }
+}
