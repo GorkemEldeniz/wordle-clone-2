@@ -394,14 +394,16 @@ function check(row) {
 	let signedLetters = [];
 	const buttons = document.querySelectorAll(".keyboard button");
 
-	let elements = virtualCopy[row].map((el, i) => {
+	let guessWordArray = [...guessWord];
+
+	let correctElements = virtualCopy[row].map((el, i) => {
 		let state = "";
+		let priority = 0;
 		if (el.value == guessWord[i]) {
 			signedLetters.push({ state: "correct", value: el.value, priority: 2 });
 			state = "correct";
-		} else if (guessWord.includes(el.value)) {
-			signedLetters.push({ state: "present", value: el.value, priority: 1 });
-			state = "present";
+			priority = 2;
+			guessWordArray.splice(i, 1);
 		} else {
 			signedLetters.push({ state: "absent", value: el.value, priority: 0 });
 			state = "absent";
@@ -409,7 +411,33 @@ function check(row) {
 		return {
 			value: el.value,
 			state,
+			priority,
 		};
+	});
+
+	let presentElements = virtualCopy[row].map((el, i) => {
+		let state = "";
+		let priority = 0;
+		if (guessWord.includes(el.value) && guessWordArray.includes(el.value)) {
+			signedLetters.push({ state: "present", value: el.value, priority: 1 });
+			state = "present";
+			priority = 1;
+		} else {
+			signedLetters.push({ state: "absent", value: el.value, priority: 0 });
+			state = "absent";
+		}
+		return {
+			value: el.value,
+			state,
+			priority,
+		};
+	});
+
+	let elements = correctElements.map((el, index) => {
+		if (el.priority > presentElements[index].priority) {
+			return el;
+		}
+		return presentElements[index];
 	});
 
 	//virtual keyboard change color events
