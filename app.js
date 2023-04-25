@@ -403,7 +403,7 @@ function check(row) {
 			signedLetters.push({ state: "correct", value: el.value, priority: 2 });
 			state = "correct";
 			priority = 2;
-			guessWordArray.splice(i, 1);
+			guessWordArray.splice(i, 1, "");
 		} else {
 			signedLetters.push({ state: "absent", value: el.value, priority: 0 });
 			state = "absent";
