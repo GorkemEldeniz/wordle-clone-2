@@ -150,16 +150,25 @@ window.addEventListener("touchstart", (e) => {
 		resultElement.classList.add("none");
 	}
 	if (e.target.classList.contains("share")) {
-		let generetedString = gameIsOver(row)
-			? new Array(6)
-					.fill("")
-					.map((el, i) => {
-						if (i < row) return "🟥";
-						if (i == row) return "🟩";
-						return "⬛️";
-					})
-					.join("")
-			: "🟥🟥🟥🟥🟥🟥";
+		let generetedString = virtualCopy
+			.map((row, index) => {
+				return (
+					row
+						.map(({ state }, i) => {
+							if (!state) {
+								return "⬜️";
+							} else if (state == "absent") {
+								return "⬛️";
+							} else if (state == "present") {
+								return "🟨";
+							} else if (state == "correct") {
+								return "🟩";
+							}
+						})
+						.join("") + "\n"
+				);
+			})
+			.join("");
 
 		let copyString = `Wordle Türkçe ${
 			row + 1
