@@ -12,7 +12,9 @@ window.addEventListener("dblclick", (e) => {
 });
 
 async function newDay() {
-	let res = await fetch("https://wordle-db.vercel.app/");
+	let res = await fetch("https://wordle-db-production.up.railway.app/", {
+		cache: "force-cache",
+	});
 	res = await res.json();
 	return res
 		.find(({ date }) => date == new Date().toDateString())
@@ -299,7 +301,11 @@ window.addEventListener("load", async (e) => {
 			tile = 5;
 		}
 
-		if (e.key.length > 1 && e.key != "Backspace" && e.key != "Enter") {
+		if (
+			(!checkIsValid(e.key) || e.key.length > 1) &&
+			e.key != "Backspace" &&
+			e.key != "Enter"
+		) {
 			return;
 		}
 
@@ -374,6 +380,12 @@ function updateStorage() {
 			isGameFinished,
 		})
 	);
+}
+
+//regex fro the keydown event
+function checkIsValid(key) {
+	const regex = /[a-zA-Z|ığüşöçĞÜŞÖÇİ]/g;
+	return regex.test(key);
 }
 
 //implement table
