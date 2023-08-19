@@ -12,7 +12,7 @@ window.addEventListener("dblclick", (e) => {
 });
 
 async function newDay() {
-	let res = await fetch("https://wordle-db-production.up.railway.app/", {
+	let res = await fetch("https://wordle-db.vercel.app/", {
 		cache: "force-cache",
 	});
 	res = await res.json();
